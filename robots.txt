@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /Fallo-Productions/login.html
+Disallow: /Fallo-Productions/inventory.html
+Sitemap: https://nf-06.github.io/Fallo-Productions/sitemap.xml

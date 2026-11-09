@@ -31,6 +31,30 @@ The contact form saves enquiries to Supabase. Staff see them under the **Inquiri
 If Supabase can't be reached, the form opens the visitor's email program instead, so enquiries still get through.
 Supabase does **not** email you when a new inquiry arrives, so check the tab regularly. The number next to the tab shows how many are new.
 
+## 4. Moving to your own domain (e.g. fallo.no)
+The web address is stored in **one file: `site.config.json`**. Everything else on the site uses relative links, so it works on any address.
+
+1. **Set the address.** In `site.config.json`, change `siteUrl` to your domain, e.g. `"https://fallo.no/"`.
+2. **Apply it.** In the VS Code terminal, run:
+   ```
+   python tools/apply-config.py
+   ```
+   This updates the share preview in `index.html`, creates the `CNAME` file GitHub Pages needs, and updates `robots.txt` and `sitemap.xml`.
+3. **Commit and push.**
+4. **Point the domain to GitHub.** Where you bought the domain (e.g. Domeneshop), open the DNS settings:
+   - For `fallo.no`, add 4 **A** records, all pointing to GitHub:
+     `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - For `www.fallo.no`, add a **CNAME** record pointing to `nf-06.github.io`
+   - Remove any old A or CNAME records for `fallo.no` / `www` that point somewhere else.
+   - **Don't touch the MX records.** They handle your email, and changing them can stop email from arriving.
+5. **GitHub:** **Settings → Pages → Custom domain** should now show your domain. Wait for the DNS check to pass (minutes to a few hours), then tick **Enforce HTTPS**.
+6. **Supabase:** **Authentication → URL Configuration**:
+   - **Site URL:** `https://fallo.no`
+   - **Redirect URLs:** add `https://fallo.no/**`, so password-reset emails link to the new address.
+7. **Check the share preview** in Facebook's "Sharing Debugger" and click **Scrape Again**, so Facebook forgets the old address.
+
+The old `nf-06.github.io/Fallo-Productions` address will automatically redirect to the new domain.
+
 ## Where to edit things
 | What | File |
 |---|---|
@@ -39,7 +63,8 @@ Supabase does **not** email you when a new inquiry arrives, so check the tab reg
 | All website text (Norwegian + English) | `js/i18n.js` |
 | Contact details, logo | `index.html` |
 | Instagram / Facebook links | `index.html` (search for "SOCIAL LINKS") |
-| Share preview (title, text, image) | `index.html` (the `og:` lines in `<head>`) |
+| Share preview title + text | `index.html` (the `og:` lines in `<head>`) |
+| Web address / domain, share image | `site.config.json`, then run `python tools/apply-config.py` |
 | About photo | `images/about.jpg` |
 | Project descriptions (both languages) | `js/main.js` (`description: { no: ..., en: ... }`) |
 | Favicon | `images/favicon.svg` |
