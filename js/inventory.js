@@ -87,9 +87,9 @@
     (modal.open ? modal : document.body).appendChild(t);
     t.textContent = msg;
     t.classList.toggle("toast--error", isError);
-    t.classList.add("show");
+    t.classList.add("is-visible");
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove("show"), isError ? 5000 : 2600);
+    t._timer = setTimeout(() => t.classList.remove("is-visible"), isError ? 5000 : 2600);
   }
 
   // Read form values, converting by type ("" → null)

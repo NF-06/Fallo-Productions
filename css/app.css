@@ -274,7 +274,7 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
   pointer-events: none;
   transition: opacity 0.25s, transform 0.25s var(--ease);
 }
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 .toast--error { background: #ff7b72; }
 
 [hidden] { display: none !important; }
