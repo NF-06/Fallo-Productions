@@ -10,7 +10,7 @@
    ========================================================= */
 
 window.APP_CONFIG = {
-  supabaseUrl: "",   // e.g. "https://abcdefgh.supabase.co"
-  supabaseKey: "",   // the anon / publishable key
+  supabaseUrl: "https://amwhmidhjuqbygsjsaiy.supabase.co/rest/v1/",   // e.g. "https://abcdefgh.supabase.co"
+  supabaseKey: "sb_publishable_9qJgV8-VwRen6VAwcN7ypw_AHUWuoY6",   // the anon / publishable key
   currency: "NOK",   // used for prices and equipment value
 };
