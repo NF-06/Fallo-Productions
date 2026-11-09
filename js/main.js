@@ -40,7 +40,7 @@ const PROJECTS = [
   {
     id: "Kometen",
     title: "Kometen",
-    year: 2024-2027,
+    year: 2026,
     venue: "Kometen Drammen",
     client: "Strømsø panorama AS",
     category: "Concert",
