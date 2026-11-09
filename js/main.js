@@ -34,7 +34,7 @@ const PROJECTS = [
     category: "Theatre",
     services: ["Full lighting design"],
     description: "Theatrical lighting for Addams family",
-    photos: 8,
+    photos: 7,
     featured: true,
   },
 ];
