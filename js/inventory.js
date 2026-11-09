@@ -47,7 +47,9 @@
   const BADGE = {
     Available: "green", "In repair": "amber", Lost: "red", Retired: "grey",
     Planned: "grey", Confirmed: "blue", Out: "amber", Returned: "green", Cancelled: "grey",
+    New: "amber", Replied: "blue", Booked: "green", Closed: "grey",
   };
+  const INQUIRY_STATUSES = ["New", "Replied", "Booked", "Closed"];
 
   /* ---------------- helpers ---------------- */
 
@@ -153,7 +155,14 @@
 
   /* ---------------- state ---------------- */
 
-  const S = { items: [], jobs: [], jobItems: [], logs: [] };
+  const S = { items: [], jobs: [], jobItems: [], logs: [], inquiries: [], inquiriesError: null };
+  // Inquiries are loaded on their own, so the inventory still works if the
+  // inquiries table hasn't been created in Supabase yet.
+  try {
+    S.inquiries = await DB.list("inquiries");
+  } catch (err) {
+    S.inquiriesError = err.message;
+  }
   try {
     const [items, jobs, jobItems, logs] = await Promise.all([
       DB.list("items"), DB.list("jobs"), DB.list("job_items"), DB.list("service_log"),
@@ -210,7 +219,7 @@
 
   /* ---------------- routing ---------------- */
 
-  const VIEWS = { dashboard: renderDashboard, equipment: renderEquipment, jobs: renderJobs, service: renderService };
+  const VIEWS = { dashboard: renderDashboard, equipment: renderEquipment, jobs: renderJobs, service: renderService, inquiries: renderInquiries };
   let view = "dashboard";
   const F = { eq: { q: "", dept: "", status: "" }, jobs: { q: "", status: "active" } };
 
@@ -223,6 +232,7 @@
   }
   function render() {
     VIEWS[view]();
+    updateInquiryCount();
   }
   window.addEventListener("hashchange", route);
 
@@ -266,6 +276,7 @@
         ${stat("Out on jobs", num(out), "units checked out")}
         ${stat("In repair", repair.length, repair.length === 1 ? "item" : "items", repair.length)}
         ${stat("Service due", due.length, "overdue or within 30 days", due.length)}
+        ${stat("New inquiries", newInquiries(), "from the website", newInquiries())}
       </div>
       <div class="panels">
         <section class="panel">
@@ -592,6 +603,100 @@
         </section>
       </div>`;
     bindLogDeletes($("#all-logs"), () => {});
+  }
+
+  /* ---------------- inquiries (from the website contact form) ---------------- */
+
+  const INQUIRY_FIELDS = { status: "text", notes: "text" };
+  const newInquiries = () => S.inquiries.filter((q) => q.status === "New").length;
+  const inquiryById = (id) => S.inquiries.find((q) => q.id === id);
+  const fmtTime = (ts) =>
+    ts ? new Date(ts).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "–";
+
+  // The little number next to the "Inquiries" tab
+  function updateInquiryCount() {
+    const n = newInquiries();
+    const el = $("#inq-count");
+    el.textContent = n;
+    el.hidden = n === 0;
+  }
+
+  function renderInquiries() {
+    const rows = [...S.inquiries].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    const setupHelp = S.inquiriesError
+      ? `<div class="panel"><h2>Inquiries aren't set up yet</h2>
+           <p class="sub">Run the "Inquiries" part of supabase/schema.sql in Supabase → SQL Editor, then reload this page.</p>
+           <p class="sub">Error: ${esc(S.inquiriesError)}</p></div>`
+      : "";
+
+    main.innerHTML = `
+      <div class="view-head">
+        <div><p class="eyebrow">From the website</p><h1>Inquiries</h1></div>
+      </div>
+      ${setupHelp || (rows.length
+        ? `<div class="table-wrap"><table class="data">
+            <thead><tr><th>Received</th><th>From</th><th>Service</th><th>Event date</th><th>Status</th></tr></thead>
+            <tbody>${rows.map((q) => `<tr class="clickable" data-inquiry="${q.id}" tabindex="0">
+              <td class="nowrap">${fmtTime(q.created_at)}</td>
+              <td><strong>${esc(q.name)}</strong><span class="sub">${esc(q.email)}</span></td>
+              <td>${esc(q.service || "—")}</td>
+              <td class="nowrap">${fmtDate(q.event_date)}</td>
+              <td>${badge(q.status)}</td>
+            </tr>`).join("")}</tbody></table></div>`
+        : `<div class="table-wrap"><p class="empty">No inquiries yet. They appear here when someone uses the contact form on the website.</p></div>`)}`;
+  }
+
+  function openInquiry(id) {
+    const q = inquiryById(id);
+    if (!q) return;
+    const subject = `Re: your enquiry${q.event_date ? " for " + fmtDate(q.event_date) : ""}`;
+    const replyHref = `mailto:${encodeURIComponent(q.email)}?subject=${encodeURIComponent(subject)}`;
+
+    openModal(`Inquiry from ${q.name}`, `
+      <dl class="inquiry-facts">
+        <dt>Received</dt><dd>${fmtTime(q.created_at)}</dd>
+        <dt>Email</dt><dd><a href="mailto:${esc(q.email)}">${esc(q.email)}</a></dd>
+        <dt>Service</dt><dd>${esc(q.service || "—")}</dd>
+        <dt>Event date</dt><dd>${fmtDate(q.event_date)}</dd>
+      </dl>
+      <p class="inquiry-message">${esc(q.message)}</p>
+      <form id="inquiry-form" class="form-grid">
+        ${select("status", "Status", INQUIRY_STATUSES, q.status)}
+        <div class="field span-3" style="align-self:end"><a class="btn btn--sm btn--ghost" href="${replyHref}">Reply by email</a></div>
+        ${field("notes", "Staff notes (only visible here)", q.notes, { type: "textarea", span: 4, rows: 3 })}
+        <div class="form-actions">
+          <div><button type="button" class="btn btn--sm btn--danger" id="inquiry-delete">Delete</button></div>
+          <div>
+            <button type="button" class="btn btn--sm btn--ghost" data-action="close-modal">Close</button>
+            <button type="submit" class="btn btn--sm">Save</button>
+          </div>
+        </div>
+      </form>`);
+
+    $("#inquiry-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        Object.assign(q, await DB.update("inquiries", q.id, readForm(e.target, INQUIRY_FIELDS)));
+        closeModal();
+        render();
+        toast("Saved");
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    $("#inquiry-delete").addEventListener("click", async () => {
+      if (!confirm(`Delete the inquiry from ${q.name}?`)) return;
+      try {
+        await DB.remove("inquiries", q.id);
+        S.inquiries = S.inquiries.filter((x) => x.id !== q.id);
+        closeModal();
+        render();
+        toast("Inquiry deleted");
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
   }
 
   /* ---------------- jobs ---------------- */
@@ -985,10 +1090,12 @@
     if (item) return openItem(item.dataset.item);
     const job = e.target.closest("[data-job]");
     if (job) return openJob(job.dataset.job);
+    const inquiry = e.target.closest("[data-inquiry]");
+    if (inquiry) return openInquiry(inquiry.dataset.inquiry);
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && e.target.matches("tr[data-item], tr[data-job]")) e.target.click();
+    if (e.key === "Enter" && e.target.matches("tr[data-item], tr[data-job], tr[data-inquiry]")) e.target.click();
   });
 
   route();

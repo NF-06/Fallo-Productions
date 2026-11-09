@@ -23,10 +23,22 @@ Until you do this, the inventory runs in **demo mode** and saves data only in yo
 
 **Free plan note:** a Supabase free project is paused after about 1 week with no activity. Your data is kept. Restore it with one click in the Supabase dashboard, or just use the inventory regularly.
 
+## 3. Website inquiries
+The contact form saves enquiries to Supabase. Staff see them under the **Inquiries** tab in the inventory.
+1. If you set up Supabase before inquiries were added, open **SQL Editor**, paste in the "Inquiries" section at the bottom of `supabase/schema.sql` and click **Run**. Running the whole file again is also safe.
+2. Send a test enquiry from the website and check that it shows up in the Inquiries tab.
+
+If Supabase can't be reached, the form opens the visitor's email program instead, so enquiries still get through.
+Supabase does **not** email you when a new inquiry arrives, so check the tab regularly. The number next to the tab shows how many are new.
+
 ## Where to edit things
 | What | File |
 |---|---|
 | Projects, photos, showcase | `js/main.js` (the `PROJECTS` list at the top) |
 | Photos | `images/projects/<project-id>/1.jpg, 2.jpg …` and `images/hero.jpg` |
-| Contact details, logo | `index.html` |
+| Contact details, logo, About text | `index.html` |
+| Instagram / Facebook links | `index.html` (search for "SOCIAL LINKS") |
+| Share preview (title, text, image) | `index.html` (the `og:` lines in `<head>`) |
+| About photo | `images/about.jpg` |
+| Favicon | `images/favicon.svg` |
 | Database connection, currency | `js/config.js` |

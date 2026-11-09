@@ -46,8 +46,8 @@ body.app { min-height: 100vh; }
   gap: 8px 20px;
   padding: 10px var(--gutter);
   font-size: 14px;
-  background: rgba(244, 167, 44, 0.1);
-  border-bottom: 1px solid rgba(244, 167, 44, 0.25);
+  background: rgba(255, 79, 163, 0.1);
+  border-bottom: 1px solid rgba(255, 79, 163, 0.25);
 }
 .demo-banner code { font-size: 13px; color: var(--accent-2); }
 
@@ -200,6 +200,7 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
 .form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .form-grid .field input, .form-grid .field select, .form-grid .field textarea { padding: 10px 12px; font-size: 14px; }
 .span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
 .span-4 { grid-column: 1 / -1; }
 .form-section {
   grid-column: 1 / -1;
@@ -288,7 +289,7 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
   .app-user__email { display: none; }
   .tabs { order: 3; flex-basis: 100%; }
   .form-grid { grid-template-columns: 1fr 1fr; }
-  .span-2 { grid-column: 1 / -1; }
+  .span-2, .span-3 { grid-column: 1 / -1; }
   .modal__body { padding: 18px 16px; }
   .modal__head { padding: 12px 16px; }
 }
@@ -311,4 +312,29 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
   #print-area .check { width: 28px; }
   #print-area .sign { display: flex; gap: 40px; margin-top: 36px; }
   #print-area .sign div { flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 9pt; }
+}
+
+/* ---------- Inquiries ---------- */
+.tab__count {
+  display: inline-grid;
+  place-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+}
+.inquiry-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; font-size: 14px; margin-bottom: 18px; }
+.inquiry-facts dt { color: var(--muted); }
+.inquiry-facts a { color: var(--accent); }
+.inquiry-message {
+  margin-bottom: 22px;
+  padding: 16px 18px;
+  white-space: pre-wrap;
+  background: var(--bg);
+  border-left: 2px solid var(--accent);
 }

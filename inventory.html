@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/app.css">
 </head>
@@ -19,8 +20,8 @@
         <path d="M16 11h8l12 27H4z" fill="url(#beam)"/>
         <defs>
           <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#f4a72c" stop-opacity=".95"/>
-            <stop offset="1" stop-color="#f4a72c" stop-opacity="0"/>
+            <stop offset="0" stop-color="#ff4fa3" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#ff4fa3" stop-opacity="0"/>
           </linearGradient>
         </defs>
       </svg>
@@ -31,6 +32,7 @@
       <a class="tab" data-view="equipment" href="#equipment">Equipment</a>
       <a class="tab" data-view="jobs" href="#jobs">Jobs</a>
       <a class="tab" data-view="service" href="#service">Service</a>
+      <a class="tab" data-view="inquiries" href="#inquiries">Inquiries <span class="tab__count" id="inq-count" hidden></span></a>
     </nav>
     <div class="app-user">
       <span class="app-user__email" id="user-email"></span>

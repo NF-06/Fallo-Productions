@@ -90,3 +90,34 @@ create policy "staff access" on items       for all to authenticated using (true
 create policy "staff access" on jobs        for all to authenticated using (true) with check (true);
 create policy "staff access" on job_items   for all to authenticated using (true) with check (true);
 create policy "staff access" on service_log for all to authenticated using (true) with check (true);
+
+-- ---------- Inquiries from the website's contact form ----------
+-- Added later: if your other tables already exist, you can paste and
+-- run just this section in the SQL Editor.
+create table if not exists inquiries (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  name        text not null check (char_length(name) between 1 and 200),
+  email       text not null check (char_length(email) between 3 and 320),
+  event_date  date,
+  service     text check (char_length(service) <= 100),
+  message     text not null check (char_length(message) between 1 and 5000),
+  status      text not null default 'New'
+              check (status in ('New','Replied','Booked','Closed')),
+  notes       text
+);
+
+alter table inquiries enable row level security;
+
+drop policy if exists "staff access"           on inquiries;
+drop policy if exists "public can send inquiry" on inquiries;
+
+-- Staff (signed in) can read, update and delete inquiries.
+create policy "staff access" on inquiries for all to authenticated using (true) with check (true);
+
+-- Website visitors can only ADD a new inquiry. They can't read, change or
+-- delete anything, and can't set the status or staff notes themselves.
+create policy "public can send inquiry" on inquiries for insert to anon
+  with check (status = 'New' and notes is null);
+
+grant insert on inquiries to anon;

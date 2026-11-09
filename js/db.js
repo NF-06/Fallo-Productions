@@ -131,7 +131,10 @@
         { id: uid(), created_at: new Date().toISOString(), item_id: items[12].id, date: day(-3), type: "Repair", description: "Intermittent dropouts on receiver 2. Sent to service.", cost: null, created_by: "demo@example.com" },
         { id: uid(), created_at: new Date().toISOString(), item_id: items[0].id, date: day(-60), type: "Service", description: "Cleaned optics and fans.", cost: 0, created_by: "demo@example.com" },
       ];
-      mem = { items, jobs, job_items, service_log };
+      const inquiries = [
+        { id: uid(), created_at: new Date().toISOString(), name: "Example Client", email: "client@example.com", event_date: day(30), service: "Lighting & audio", message: "Hi! We're planning a company party for about 200 guests and need lights and sound. Could you send us a quote?", status: "New", notes: null },
+      ];
+      mem = { items, jobs, job_items, service_log, inquiries };
       save();
       return mem;
     }
@@ -146,16 +149,16 @@
       async resetPassword() {},
       async setPassword() {},
       onRecovery() {},
-      async list(table) { return clone(load()[table]); },
+      async list(table) { return clone(load()[table] || []); },
       async insert(table, row) {
         const db = load();
         const r = { id: uid(), created_at: new Date().toISOString(), ...row };
-        db[table].push(r);
+        (db[table] ||= []).push(r);
         save();
         return clone(r);
       },
       async update(table, id, patch) {
-        const r = load()[table].find((x) => x.id === id);
+        const r = (load()[table] || []).find((x) => x.id === id);
         if (!r) throw new Error("Not found");
         Object.assign(r, patch);
         save();
@@ -163,7 +166,7 @@
       },
       async remove(table, id) {
         const db = load();
-        db[table] = db[table].filter((x) => x.id !== id);
+        db[table] = (db[table] || []).filter((x) => x.id !== id);
         // mimic "on delete cascade"
         if (table === "items") {
           db.job_items = db.job_items.filter((x) => x.item_id !== id);

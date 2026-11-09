@@ -20,7 +20,7 @@ const PROJECTS = [
     venue: "Outdoor custom stage",
     client: "Hokksund byteater Jr",
     category: "Theatre",
-    services: ["Full lighting design"],
+    services: ["Lighting design"],
     description: "Theatrical lighting for Addams family",
     photos: 6,
     featured: true,
@@ -38,7 +38,7 @@ const PROJECTS = [
     photos: 1,
     featured: true,
   },
-  
+
    {
     id: "DRMH",
     title: "Drammen helsekonferanse",
@@ -408,13 +408,62 @@ function onScroll() {
 
 /* ---------- contact form (opens the visitor's email app) ---------- */
 
-$("#contact-form").addEventListener("submit", (e) => {
+// The enquiry is saved to the "inquiries" table in Supabase, where staff see it
+// under the Inquiries tab. If Supabase isn't set up or can't be reached, we fall
+// back to opening the visitor's email program with the message filled in.
+$("#contact-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const f = new FormData(e.target);
-  const subject = `Enquiry: ${f.get("type")}${f.get("date") ? " – " + f.get("date") : ""}`;
-  const body = `Name: ${f.get("name")}\nEmail: ${f.get("email")}\nEvent date: ${f.get("date") || "-"}\nService: ${f.get("type")}\n\n${f.get("message")}`;
-  window.location.href = `mailto:${e.target.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const form = e.target;
+  const f = new FormData(form);
+  const status = $("#cf-status");
+  const button = form.querySelector("button[type=submit]");
+
+  if (f.get("website")) return; // the hidden spam trap was filled in: a bot, so ignore it
+
+  const inquiry = {
+    name: f.get("name").trim(),
+    email: f.get("email").trim(),
+    event_date: f.get("date") || null,
+    service: f.get("type"),
+    message: f.get("message").trim(),
+  };
+
+  button.disabled = true;
+  status.classList.remove("is-error");
+  status.textContent = "Sending…";
+  try {
+    await saveInquiry(inquiry);
+    form.reset();
+    status.textContent = "Thanks! Your enquiry has been sent. We'll get back to you soon.";
+  } catch (err) {
+    console.warn("Could not save enquiry, falling back to email:", err);
+    status.classList.add("is-error");
+    status.textContent = "Couldn't send the form. Opening your email program instead…";
+    openEmailFallback(form.dataset.email, inquiry);
+  } finally {
+    button.disabled = false;
+  }
 });
+
+async function saveInquiry(inquiry) {
+  const cfg = window.APP_CONFIG || {};
+  const url = (cfg.supabaseUrl || "").trim().replace(/\/(rest|auth)\/v1\/?.*$/, "").replace(/\/+$/, "");
+  const key = (cfg.supabaseKey || "").trim();
+  if (!url || !key) throw new Error("Supabase is not configured in js/config.js");
+
+  const res = await fetch(`${url}/rest/v1/inquiries`, {
+    method: "POST",
+    headers: { apikey: key, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(inquiry),
+  });
+  if (!res.ok) throw new Error(`Supabase answered ${res.status}: ${await res.text()}`);
+}
+
+function openEmailFallback(to, q) {
+  const subject = `Enquiry: ${q.service}${q.event_date ? " – " + q.event_date : ""}`;
+  const body = `Name: ${q.name}\nEmail: ${q.email}\nEvent date: ${q.event_date || "-"}\nService: ${q.service}\n\n${q.message}`;
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 /* ---------- init ---------- */
 
