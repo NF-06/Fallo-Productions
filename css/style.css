@@ -1,5 +1,5 @@
 /* =========================================================
-   Fallo Showlys — main stylesheet
+   Fallo Productions — main stylesheet
    ========================================================= */
 
 :root {
@@ -70,8 +70,8 @@ body.menu-open .site-header { background: transparent; border-color: transparent
 .logo__text span {
   margin-top: 4px;
   font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.46em;
+  font-size: 11px;
+  letter-spacing: 0.28em;
   color: var(--accent);
 }
 

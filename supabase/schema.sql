@@ -1,5 +1,5 @@
 -- =========================================================
--- Fallo Showlys inventory — database schema
+-- Fallo Productions inventory — database schema
 -- Paste this whole file into Supabase → SQL Editor → Run.
 -- =========================================================
 

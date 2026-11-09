@@ -1,4 +1,4 @@
-# Fallo Showlys website: setup
+# Fallo Productions website: setup
 
 ## 1. Publish on GitHub Pages
 1. Create a repository on GitHub and upload everything in this folder.

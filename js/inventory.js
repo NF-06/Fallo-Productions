@@ -1,5 +1,5 @@
 /* =========================================================
-   Fallo Showlys — inventory app
+   Fallo Productions — inventory app
    Equipment, jobs (with availability + packing lists) and
    service history for lighting & audio gear.
    ========================================================= */
@@ -912,7 +912,7 @@
           </tr>`).join("")}</tbody>
         </table>`).join("")}
       <div class="sign"><div>Packed by / date</div><div>Checked out by / date</div><div>Returned &amp; checked by / date</div></div>
-      <p class="meta" style="margin-top:20px;font-size:9pt">Printed ${fmtDate(today())} · Fallo Showlys</p>`;
+      <p class="meta" style="margin-top:20px;font-size:9pt">Printed ${fmtDate(today())} · Fallo Productions</p>`;
     window.print();
   }
 

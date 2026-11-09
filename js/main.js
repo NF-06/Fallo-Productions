@@ -1,5 +1,5 @@
 /* =========================================================
-   Fallo Showlys — site content + behaviour
+   Fallo Productions — site content + behaviour
    ---------------------------------------------------------
    EDIT YOUR PROJECTS HERE. Everything on the page (showcase,
    gallery and previous works) is built from this one list, so
