@@ -10,6 +10,13 @@
      - a list of the exact file names (case-sensitive!), or
      - a number N, if the files are named 1.jpg, 2.jpg ... N.jpg
    The first photo is used as the cover unless you set "cover".
+
+   TRANSLATION (Norwegian / English):
+   - "description" (and any other text) can be written as
+     { no: "norsk tekst", en: "English text" }
+   - single words like category, services and venue can stay
+     plain text; their translations are in the "terms" list
+     in js/i18n.js
    ========================================================= */
 
 const PROJECTS = [
@@ -21,7 +28,10 @@ const PROJECTS = [
     client: "Hokksund byteater Jr",
     category: "Theatre",
     services: ["Lighting design"],
-    description: "Theatrical lighting for Addams family",
+    description: {
+      no: "Teaterlys for Addams Family",
+      en: "Theatrical lighting for Addams family",
+    },
     photos: 6,
     featured: true,
   },
@@ -34,7 +44,10 @@ const PROJECTS = [
     client: "Gateway Studios",
     category: "Live Event",
     services: ["Lighting design"],
-    description: "Lights for fashion show",
+    description: {
+      no: "Lys til moteshow",
+      en: "Lights for fashion show",
+    },
     photos: 1,
     featured: true,
   },
@@ -47,7 +60,10 @@ const PROJECTS = [
     client: "Gateway Studios",
     category: "Conferance",
     services: ["Live Lighting design"],
-    description: "Conferance lights for audience surrounding stage",
+    description: {
+      no: "Konferanselys for et publikum som sitter rundt scenen",
+      en: "Conferance lights for audience surrounding stage",
+    },
     photos: 2,
     featured: true,
   },
@@ -60,7 +76,10 @@ const PROJECTS = [
     client: "Nedbrutt",
     category: "Theatre",
     services: ["Lighting design", "Technical Project management"],
-    description: "Full lighting design, Planning of audio and lights for full scale theatrical production, Rigging of audio and lights.",
+    description: {
+      no: "Komplett lysdesign, planlegging av lyd og lys for en fullskala teaterproduksjon, og rigging av lyd og lys.",
+      en: "Full lighting design, Planning of audio and lights for full scale theatrical production, Rigging of audio and lights.",
+    },
     photos: 3,
     featured: true,
   },
@@ -73,7 +92,10 @@ const PROJECTS = [
     client: "Strømsø panorama AS",
     category: "Concert",
     services: ["Live Lighting design"],
-    description: "Concerts lights in multiple genres such as metal, rock and punk",
+    description: {
+      no: "Konsertlys i flere sjangre, som metal, rock og punk",
+      en: "Concerts lights in multiple genres such as metal, rock and punk",
+    },
     photos: 5,
     featured: true,
   },
@@ -85,7 +107,10 @@ const PROJECTS = [
     client: "Hokksund byteater Jr",
     category: "Theatre",
     services: ["Theatrical lighting design"],
-    description: "Lighting design with focus on bringing the scenery out of focus, and the actors in front",
+    description: {
+      no: "Lysdesign med fokus på å dempe scenografien og løfte skuespillerne fram",
+      en: "Lighting design with focus on bringing the scenery out of focus, and the actors in front",
+    },
     photos: 6,
     featured: true,
   },
@@ -96,8 +121,11 @@ const PROJECTS = [
     venue: "Solbergelva spinderi",
     client: "Nedbrutt",
     category: "Theatre",
-    services: ["Lighting design", "audio production"],
-    description: "Concerts lights in multiple genres such as metal, rock and punk",
+    services: ["Lighting design", "audio production", "technical project planning"],
+    description: {
+      no: "lysdesign og lydteknikk for første teaterproduksjonen til nedbrutt",
+      en: "lighting design and audio design for Nedbrutt's first theatre production",
+    },
     photos: 3,
     featured: true,
   },
@@ -111,7 +139,10 @@ const PROJECTS = [
     client: "Glassverket musikkkorps",
     category: "Concert",
     services: ["Live Lighting design"],
-    description: "Lights for band, church",
+    description: {
+      no: "Lys for korps i kirke",
+      en: "Lights for band, church",
+    },
     photos: 1,
     featured: true,
   },
@@ -174,7 +205,7 @@ function setMenu(open) {
   menu.classList.toggle("is-open", open);
   menu.inert = !open;
   toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  toggle.setAttribute("aria-label", t(open ? "menu.close" : "menu.open"));
   document.body.classList.toggle("menu-open", open);
   document.body.classList.toggle("no-scroll", open);
 }
@@ -194,10 +225,10 @@ function renderShowcase() {
       <div class="show__caption reveal">
         <span class="show__num">${String(i + 1).padStart(2, "0")}</span>
         <div>
-          <p class="show__meta">${p.venue} · ${p.year}</p>
+          <p class="show__meta">${tr(p.venue)} · ${p.year}</p>
           <h3>${p.title}</h3>
-          <ul class="tags">${p.services.map((s) => `<li>${s}</li>`).join("")}</ul>
-          <button class="link-arrow" data-project="${p.id}">View photos <span aria-hidden="true">→</span></button>
+          <ul class="tags">${p.services.map((s) => `<li>${tr(s)}</li>`).join("")}</ul>
+          <button class="link-arrow" data-project="${p.id}">${t("showcase.viewPhotos")} <span aria-hidden="true">→</span></button>
         </div>
       </div>
     </article>`
@@ -209,30 +240,33 @@ function renderShowcase() {
 
 const TILE_PATTERN = ["tile--wide tile--tall", "", "", "tile--tall", "", "tile--wide", "", ""];
 let galleryItems = PHOTOS;
+let galleryCat = "All"; // the selected filter (the category as written in PROJECTS)
 
 function renderFilters() {
   const cats = ["All", ...new Set(PROJECTS.map((p) => p.category))];
   $("#gallery-filters").innerHTML = cats
-    .map((c, i) => `<button class="filter" aria-pressed="${i === 0}" data-cat="${c}">${c}</button>`)
+    .map((c) => `<button class="filter" aria-pressed="${c === galleryCat}" data-cat="${c}">${c === "All" ? t("gallery.all") : tr(c)}</button>`)
     .join("");
-  $("#gallery-filters").addEventListener("click", (e) => {
-    const btn = e.target.closest(".filter");
-    if (!btn) return;
-    $$(".filter").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-    renderGallery(btn.dataset.cat);
-  });
 }
 
-function renderGallery(cat = "All") {
+$("#gallery-filters").addEventListener("click", (e) => {
+  const btn = e.target.closest(".filter");
+  if (!btn) return;
+  $$(".filter").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+  renderGallery(btn.dataset.cat);
+});
+
+function renderGallery(cat = galleryCat) {
+  galleryCat = cat;
   galleryItems = cat === "All" ? PHOTOS : PHOTOS.filter((ph) => ph.project.category === cat);
   const el = $("#gallery");
   el.innerHTML = galleryItems
     .map(
       (ph, i) => `
     <button class="tile ${TILE_PATTERN[i % TILE_PATTERN.length]}" data-index="${i}"
-            aria-label="${ph.project.title}, photo ${ph.index + 1}">
+            aria-label="${t("photo.label", { title: ph.project.title, n: ph.index + 1 })}">
       <span class="tile__img" data-bg="${ph.src}"></span>
-      <span class="tile__cap"><small>${ph.project.category}</small>${ph.project.title}</span>
+      <span class="tile__cap"><small>${tr(ph.project.category)}</small>${ph.project.title}</span>
     </button>`
     )
     .join("");
@@ -251,16 +285,16 @@ function renderWorks() {
     (p) => `
     <article class="work reveal">
       <div class="work__media">
-        <button class="work__cover tile" data-project="${p.id}" aria-label="View photos from ${p.title}" style="display:block;width:100%">
+        <button class="work__cover tile" data-project="${p.id}" aria-label="${t("works.viewPhotosFrom", { title: p.title })}" style="display:block;width:100%">
           <span class="tile__img" data-bg="${p.cover}"></span>
-          <span class="work__count">${p.photoList.length} photos</span>
+          <span class="work__count">${t("works.photoCount", { n: p.photoList.length })}</span>
         </button>
         <div class="work__thumbs">
           ${p.photoList
             .slice(0, 5)
             .map(
               (src, i) =>
-                `<button class="work__thumb" data-bg="${src}" data-project="${p.id}" data-start="${i}" aria-label="${p.title}, photo ${i + 1}"></button>`
+                `<button class="work__thumb" data-bg="${src}" data-project="${p.id}" data-start="${i}" aria-label="${t("photo.label", { title: p.title, n: i + 1 })}"></button>`
             )
             .join("")}
         </div>
@@ -268,13 +302,13 @@ function renderWorks() {
       <div>
         <span class="work__year">${p.year}</span>
         <h3>${p.title}</h3>
-        <p class="work__desc">${p.description}</p>
+        <p class="work__desc">${tr(p.description)}</p>
         <dl class="work__facts">
-          <dt>Venue</dt><dd>${p.venue}</dd>
-          <dt>Client</dt><dd>${p.client}</dd>
-          <dt>Services</dt><dd>${p.services.join(", ")}</dd>
+          <dt>${t("works.venue")}</dt><dd>${tr(p.venue)}</dd>
+          <dt>${t("works.client")}</dt><dd>${tr(p.client)}</dd>
+          <dt>${t("works.services")}</dt><dd>${p.services.map(tr).join(", ")}</dd>
         </dl>
-        <button class="link-arrow" data-project="${p.id}">View project photos <span aria-hidden="true">→</span></button>
+        <button class="link-arrow" data-project="${p.id}">${t("works.viewProjectPhotos")} <span aria-hidden="true">→</span></button>
       </div>
     </article>`
   ).join("");
@@ -332,9 +366,9 @@ function showPhoto(index) {
     lb.stage.classList.add("has-img");
   };
   lb.img.onerror = () => (lb.img.hidden = true);
-  lb.img.alt = `${ph.project.title} — photo ${ph.index + 1}`;
+  lb.img.alt = t("lightbox.photo", { title: ph.project.title, n: ph.index + 1 });
   lb.img.src = ph.src;
-  lb.caption.textContent = `${ph.project.title} · ${ph.project.venue} · ${ph.project.year}`;
+  lb.caption.textContent = `${ph.project.title} · ${tr(ph.project.venue)} · ${ph.project.year}`;
   lb.counter.textContent = `${String(lb.i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
   const multi = n > 1;
   $("#lb-prev").hidden = !multi;
@@ -406,7 +440,7 @@ function onScroll() {
   });
 }
 
-/* ---------- contact form (opens the visitor's email app) ---------- */
+/* ---------- contact form ---------- */
 
 // The enquiry is saved to the "inquiries" table in Supabase, where staff see it
 // under the Inquiries tab. If Supabase isn't set up or can't be reached, we fall
@@ -430,15 +464,15 @@ $("#contact-form").addEventListener("submit", async (e) => {
 
   button.disabled = true;
   status.classList.remove("is-error");
-  status.textContent = "Sending…";
+  status.textContent = t("form.sending");
   try {
     await saveInquiry(inquiry);
     form.reset();
-    status.textContent = "Thanks! Your enquiry has been sent. We'll get back to you soon.";
+    status.textContent = t("form.sent");
   } catch (err) {
     console.warn("Could not save enquiry, falling back to email:", err);
     status.classList.add("is-error");
-    status.textContent = "Couldn't send the form. Opening your email program instead…";
+    status.textContent = t("form.failed");
     openEmailFallback(form.dataset.email, inquiry);
   } finally {
     button.disabled = false;
@@ -467,12 +501,25 @@ function openEmailFallback(to, q) {
 
 /* ---------- init ---------- */
 
-renderShowcase();
-renderFilters();
-renderGallery();
-renderWorks();
-applyBackgrounds();
-setupReveal();
+// Builds everything that comes from the PROJECTS list (in the current language)
+function renderProjects() {
+  renderShowcase();
+  renderFilters();
+  renderGallery();
+  renderWorks();
+  applyBackgrounds();
+  setupReveal();
+}
+
+renderProjects();
+
+// The NO / EN switch (js/i18n.js) sends this event: rebuild the lists in the new language
+document.addEventListener("languagechange", () => {
+  renderProjects();
+  setMenu(menu.classList.contains("is-open"));
+  onScroll();
+  if (lb.el.classList.contains("is-open")) showPhoto(lb.i);
+});
 onScroll();
 window.addEventListener("scroll", onScroll, { passive: true });
 window.addEventListener("resize", onScroll);

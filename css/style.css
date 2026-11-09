@@ -86,6 +86,21 @@ body.menu-open .site-header { background: transparent; border-color: transparent
   transition: color 0.2s;
 }
 .social svg { width: 22px; height: 22px; }
+
+/* NO / EN language switch */
+.lang-switch { display: flex; margin-right: 6px; }
+.lang-switch button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 4px;
+  font: 600 13px var(--font-body);
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.lang-switch button + button { border-left: 1px solid var(--line); }
+.lang-switch button:hover { color: var(--text); }
+.lang-switch button[aria-pressed="true"] { color: var(--accent); }
 .social:hover { color: var(--accent); }
 
 /* Hamburger */
@@ -552,6 +567,8 @@ h2 { font-weight: 700; font-size: clamp(40px, 6vw, 80px); line-height: 0.95; }
   .header-actions { gap: 0; }
   .social { width: 36px; }
   .social svg { width: 20px; height: 20px; }
+  .lang-switch { margin-right: 2px; }
+  .lang-switch button { min-width: 28px; font-size: 12px; }
   .scroll-cue { display: none; }
   .services__grid { grid-template-columns: 1fr; }
   .service { border-left: 0; }

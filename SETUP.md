@@ -36,9 +36,11 @@ Supabase does **not** email you when a new inquiry arrives, so check the tab reg
 |---|---|
 | Projects, photos, showcase | `js/main.js` (the `PROJECTS` list at the top) |
 | Photos | `images/projects/<project-id>/1.jpg, 2.jpg …` and `images/hero.jpg` |
-| Contact details, logo, About text | `index.html` |
+| All website text (Norwegian + English) | `js/i18n.js` |
+| Contact details, logo | `index.html` |
 | Instagram / Facebook links | `index.html` (search for "SOCIAL LINKS") |
 | Share preview (title, text, image) | `index.html` (the `og:` lines in `<head>`) |
 | About photo | `images/about.jpg` |
+| Project descriptions (both languages) | `js/main.js` (`description: { no: ..., en: ... }`) |
 | Favicon | `images/favicon.svg` |
 | Database connection, currency | `js/config.js` |
