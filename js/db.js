@@ -5,7 +5,10 @@
    ========================================================= */
 
 (function () {
-  const cfg = window.APP_CONFIG || {};
+  const cfg = { ...(window.APP_CONFIG || {}) };
+  // Accept URLs pasted with extra paths like ".../rest/v1/" — supabase-js needs only the base URL.
+  cfg.supabaseUrl = (cfg.supabaseUrl || "").trim().replace(/\/(rest|auth)\/v1\/?.*$/, "").replace(/\/+$/, "");
+  cfg.supabaseKey = (cfg.supabaseKey || "").trim();
   const DEMO = !(cfg.supabaseUrl && cfg.supabaseKey);
 
   /* ---------------- Supabase ---------------- */

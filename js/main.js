@@ -5,10 +5,11 @@
    gallery and previous works) is built from this one list, so
    every photo stays linked to the project it belongs to.
 
-   Photos go in:  images/projects/<project id>/1.jpg, 2.jpg ...
-   Until a photo exists, a stage-light placeholder is shown.
-
-   The projects below are EXAMPLE CONTENT — replace them.
+   Photos go in:  images/projects/<project id>/
+   "photos" is either:
+     - a list of the exact file names (case-sensitive!), or
+     - a number N, if the files are named 1.jpg, 2.jpg ... N.jpg
+   The first photo is used as the cover unless you set "cover".
    ========================================================= */
 
 const PROJECTS = [
@@ -36,7 +37,6 @@ const PROJECTS = [
     photos: 8,
     featured: true,
   },
-  
 ];
 
 /* ---------- helpers ---------- */
@@ -50,8 +50,10 @@ PROJECTS.forEach((p) => {
   const files = Array.isArray(p.photos)
     ? p.photos
     : Array.from({ length: p.photos }, (_, i) => `${i + 1}.jpg`);
-  p.photoList = files.map((f) => `images/projects/${p.id}/${f}`);
-  p.cover = p.cover ? `images/projects/${p.id}/${p.cover}` : p.photoList[0];
+  // encodeURIComponent handles spaces, brackets etc. in folder/file names
+  const path = (f) => `images/projects/${encodeURIComponent(p.id)}/${encodeURIComponent(f)}`;
+  p.photoList = files.map(path);
+  p.cover = p.cover ? path(p.cover) : p.photoList[0];
 });
 
 // Every photo, linked back to its project
