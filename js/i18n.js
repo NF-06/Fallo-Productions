@@ -74,6 +74,8 @@ const I18N = {
     "gallery.all": "Alle",
     "photo.label": "{title}, bilde {n}",
     "gallery.share": "Kopier lenke til {title}, bilde {n}",
+    "photo.credit": "Foto: {name}",
+    "works.photographer": "Foto",
 
     // Previous works
     "works.eyebrow": "Tidligere arbeid",
@@ -189,6 +191,8 @@ const I18N = {
     "gallery.all": "All",
     "photo.label": "{title}, photo {n}",
     "gallery.share": "Copy link to {title}, photo {n}",
+    "photo.credit": "Photo: {name}",
+    "works.photographer": "Photo",
 
     "works.eyebrow": "Previous works",
     "works.title": "Projects",

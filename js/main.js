@@ -11,6 +11,10 @@
      - a number N, if the files are named 1.jpg, 2.jpg ... N.jpg
    The first photo is used as the cover unless you set "cover".
 
+   PHOTO CREDIT: "photographer" is shown as "Foto: <name>" on
+   the showcase, gallery, project list and photo viewer.
+   Leave it as "" to show no credit for that project.
+
    TRANSLATION (Norwegian / English):
    - "description" (and any other text) can be written as
      { no: "norsk tekst", en: "English text" }
@@ -26,6 +30,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Outdoor custom stage",
     client: "Hokksund byteater Jr",
+    photographer: "Leila Irene Bråthen", // who took the photos, e.g. "Ola Nordmann"
     category: "Theatre",
     services: ["Lighting design"],
     description: {
@@ -42,6 +47,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Gateway studios fornebu",
     client: "Gateway Studios",
+    photographer: "", // who took the photos, e.g. "Ola Nordmann"
     category: "Live Event",
     services: ["Lighting design"],
     description: {
@@ -58,6 +64,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Gateway Studios Drammen",
     client: "Gateway Studios",
+    photographer: "", // who took the photos, e.g. "Ola Nordmann"
     category: "Conferance",
     services: ["Live Lighting design"],
     description: {
@@ -74,6 +81,7 @@ const PROJECTS = [
     year: 2025,
     venue: "Mjøndalen Samfunnshus",
     client: "Nedbrutt",
+    photographer: "", // who took the photos, e.g. "Ola Nordmann"
     category: "Theatre",
     services: ["Lighting design", "Technical Project management"],
     description: {
@@ -90,6 +98,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Kometen Drammen",
     client: "Strømsø panorama AS",
+    photographer: "Anine Desire", // who took the photos, e.g. "Ola Nordmann"
     category: "Concert",
     services: ["Live Lighting design"],
     description: {
@@ -105,6 +114,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Arbeideren hokksund",
     client: "Hokksund byteater Jr",
+    photographer: "Leila Irene Bråthen", // who took the photos, e.g. "Ola Nordmann"
     category: "Theatre",
     services: ["Theatrical lighting design"],
     description: {
@@ -120,6 +130,7 @@ const PROJECTS = [
     year: 2026,
     venue: "Solbergelva spinderi",
     client: "Nedbrutt",
+    photographer: "", // who took the photos, e.g. "Ola Nordmann"
     category: "Theatre",
     services: ["Lighting design", "audio production", "technical project planning"],
     description: {
@@ -137,6 +148,7 @@ const PROJECTS = [
     year: 2024,
     venue: "Tangen kirke",
     client: "Glassverket musikkkorps",
+    photographer: "", // who took the photos, e.g. "Ola Nordmann"
     category: "Concert",
     services: ["Live Lighting design"],
     description: {
@@ -149,6 +161,9 @@ const PROJECTS = [
 ];
 
 /* ---------- helpers ---------- */
+
+// "Foto: Ola Nordmann", or "" if no photographer is set for the project
+const photoCredit = (p) => (p.photographer ? t("photo.credit", { name: p.photographer }) : "");
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -229,6 +244,7 @@ function renderShowcase() {
           <h3>${p.title}</h3>
           <ul class="tags">${p.services.map((s) => `<li>${tr(s)}</li>`).join("")}</ul>
           <button class="link-arrow" data-project="${p.id}">${t("showcase.viewPhotos")} <span aria-hidden="true">→</span></button>
+          ${p.photographer ? `<p class="photo-credit">${photoCredit(p)}</p>` : ""}
         </div>
       </div>
     </article>`
@@ -266,7 +282,7 @@ function renderGallery(cat = galleryCat) {
     <div class="tile ${TILE_PATTERN[i % TILE_PATTERN.length]}" data-index="${i}">
       <button class="tile__open" aria-label="${t("photo.label", { title: ph.project.title, n: ph.index + 1 })}">
         <span class="tile__img" data-bg="${ph.src}"></span>
-        <span class="tile__cap"><small>${tr(ph.project.category)}</small>${ph.project.title}</span>
+        <span class="tile__cap"><small>${tr(ph.project.category)}</small>${ph.project.title}${ph.project.photographer ? `<span class="photo-credit">${photoCredit(ph.project)}</span>` : ""}</span>
       </button>
       <button class="tile__share" aria-label="${t("gallery.share", { title: ph.project.title, n: ph.index + 1 })}">${SHARE_ICON}</button>
     </div>`
@@ -332,6 +348,7 @@ function renderWorks() {
           <dt>${t("works.venue")}</dt><dd>${tr(p.venue)}</dd>
           <dt>${t("works.client")}</dt><dd>${tr(p.client)}</dd>
           <dt>${t("works.services")}</dt><dd>${p.services.map(tr).join(", ")}</dd>
+          ${p.photographer ? `<dt>${t("works.photographer")}</dt><dd>${p.photographer}</dd>` : ""}
         </dl>
         <button class="link-arrow" data-project="${p.id}">${t("works.viewProjectPhotos")} <span aria-hidden="true">→</span></button>
       </div>
@@ -463,7 +480,9 @@ function showPhoto(index) {
   lb.img.onerror = () => (lb.img.hidden = true);
   lb.img.alt = t("lightbox.photo", { title: ph.project.title, n: ph.index + 1 });
   lb.img.src = ph.src;
-  lb.caption.textContent = `${ph.project.title} · ${tr(ph.project.venue)} · ${ph.project.year}`;
+  lb.caption.textContent = [ph.project.title, tr(ph.project.venue), ph.project.year, photoCredit(ph.project)]
+    .filter(Boolean)
+    .join(" · ");
   lb.counter.textContent = `${String(lb.i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
   const multi = n > 1;
   $("#lb-prev").hidden = !multi;

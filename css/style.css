@@ -449,6 +449,9 @@ h2 { font-weight: 700; font-size: clamp(40px, 6vw, 80px); line-height: 0.95; }
   transform: translateY(8px);
   transition: opacity 0.3s, transform 0.3s var(--ease);
 }
+/* "Foto: name" credit line */
+.photo-credit { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; color: var(--muted); }
+.tile__cap .photo-credit { margin-top: 2px; font-size: 11px; color: #d6d3cc; }
 .tile__cap small { display: block; color: var(--accent); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
 .tile:hover::after, .tile:focus-visible::after, .tile:focus-within::after,
 .tile:hover .tile__cap, .tile:focus-visible .tile__cap, .tile:focus-within .tile__cap { opacity: 1; transform: none; }
