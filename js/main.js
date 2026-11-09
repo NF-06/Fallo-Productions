@@ -14,18 +14,6 @@
 
 const PROJECTS = [
   {
-    id: "Spamalot",
-    title: "Monthy python's Spamalot",
-    year: 2025,
-    venue: "Mjøndalen Samfunnshus",
-    client: "Nedbrutt",
-    category: "Theatre",
-    services: ["Lighting design", "Technical Project management"],
-    description: "Full lighting design, Planning of audio and lights for full scale theatrical production, Rigging of audio and lights.",
-    photos: 3,
-    featured: true,
-  },
-  {
     id: "Addams",
     title: "Addams Family",
     year: 2026,
@@ -37,6 +25,46 @@ const PROJECTS = [
     photos: 6,
     featured: true,
   },
+
+   {
+    id: "MN",
+    title: "Miss Norway 2026",
+    year: 2026,
+    venue: "Gateway studios fornebu",
+    client: "Gateway Studios",
+    category: "Live Event",
+    services: ["Lighting design"],
+    description: "Lights for fashion show",
+    photos: 1,
+    featured: true,
+  },
+  
+   {
+    id: "DRMH",
+    title: "Drammen helsekonferanse",
+    year: 2026,
+    venue: "Gateway Studios Drammen",
+    client: "Gateway Studios",
+    category: "Conferance",
+    services: ["Live Lighting design"],
+    description: "Conferance lights for audience surrounding stage",
+    photos: 2,
+    featured: true,
+  },
+
+  {
+    id: "Spamalot",
+    title: "Monthy python's Spamalot",
+    year: 2025,
+    venue: "Mjøndalen Samfunnshus",
+    client: "Nedbrutt",
+    category: "Theatre",
+    services: ["Lighting design", "Technical Project management"],
+    description: "Full lighting design, Planning of audio and lights for full scale theatrical production, Rigging of audio and lights.",
+    photos: 3,
+    featured: true,
+  },
+  
   {
     id: "Kometen",
     title: "Kometen",
@@ -73,30 +101,8 @@ const PROJECTS = [
     photos: 3,
     featured: true,
   },
-  {
-    id: "MN",
-    title: "Miss Norway 2026",
-    year: 2026,
-    venue: "Gateway studios fornebu",
-    client: "Gateway Studios",
-    category: "Live Event",
-    services: ["Lighting design"],
-    description: "Lights for fashion show",
-    photos: 1,
-    featured: true,
-  },
-  {
-    id: "DRMH",
-    title: "Drammen helsekonferanse",
-    year: 2026,
-    venue: "Gateway Studios Drammen",
-    client: "Gateway Studios",
-    category: "Conferance",
-    services: ["Live Lighting design"],
-    description: "Conferance lights for audience surrounding stage",
-    photos: 2,
-    featured: true,
-  },
+ 
+
   {
     id: "TKK",
     title: "Glassverket musikkkorps",
