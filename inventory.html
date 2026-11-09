@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Inventory — Fallo Showlys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="app">
+  <header class="app-bar">
+    <a class="logo" href="index.html" aria-label="Back to website">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M14 4h12l-2 7h-8z" fill="currentColor"/>
+        <path d="M16 11h8l12 27H4z" fill="url(#beam)"/>
+        <defs>
+          <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f4a72c" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#f4a72c" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo__text">FALLO<span>SHOWLYS</span></span>
+    </a>
+    <nav class="tabs" aria-label="Inventory sections">
+      <a class="tab" data-view="dashboard" href="#dashboard">Dashboard</a>
+      <a class="tab" data-view="equipment" href="#equipment">Equipment</a>
+      <a class="tab" data-view="jobs" href="#jobs">Jobs</a>
+      <a class="tab" data-view="service" href="#service">Service</a>
+    </nav>
+    <div class="app-user">
+      <span class="app-user__email" id="user-email"></span>
+      <button class="btn btn--sm btn--ghost" data-action="sign-out">Sign out</button>
+    </div>
+  </header>
+
+  <div class="demo-banner" id="demo-banner" hidden>
+    <span><strong>Demo mode.</strong> Data is only saved in this browser. Connect Supabase in <code>js/config.js</code> to go live.</span>
+    <button class="link-arrow" data-action="reset-demo">Reset demo data</button>
+  </div>
+
+  <main class="app-main" id="app-main">
+    <p class="empty">Loading inventory…</p>
+  </main>
+
+  <dialog class="modal" id="modal" aria-labelledby="modal-title">
+    <div class="modal__head">
+      <h2 id="modal-title"></h2>
+      <button class="lightbox__close" data-action="close-modal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal__body" id="modal-body"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="print-area"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/inventory.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Staff Login — Fallo Showlys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="Fallo Showlys – home">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M14 4h12l-2 7h-8z" fill="currentColor"/>
+        <path d="M16 11h8l12 27H4z" fill="url(#beam)"/>
+        <defs>
+          <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f4a72c" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#f4a72c" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo__text">FALLO<span>SHOWLYS</span></span>
+    </a>
+    <a class="back-link" href="index.html">← Back to website</a>
+  </header>
+
+  <main class="auth">
+    <!-- Sign in -->
+    <form class="auth__card" id="login-form">
+      <div>
+        <p class="eyebrow">Staff area</p>
+        <h1>Inventory login</h1>
+      </div>
+      <p>Sign in to manage lighting and audio equipment.</p>
+      <div class="field">
+        <label for="lg-user">Email</label>
+        <input id="lg-user" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="lg-pass">Password</label>
+        <input id="lg-pass" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" type="submit" id="lg-submit">Sign in</button>
+      <button class="back-link" type="button" id="lg-forgot">Forgot password?</button>
+      <p class="auth__note" id="login-note" hidden></p>
+    </form>
+
+    <!-- Set new password (after clicking the reset link in email) -->
+    <form class="auth__card" id="reset-form" hidden>
+      <div>
+        <p class="eyebrow">Staff area</p>
+        <h1>New password</h1>
+      </div>
+      <div class="field">
+        <label for="rs-pass">New password</label>
+        <input id="rs-pass" type="password" autocomplete="new-password" minlength="8" required>
+      </div>
+      <button class="btn" type="submit">Save password</button>
+      <p class="auth__note" id="reset-note" hidden></p>
+    </form>
+
+    <!-- Demo mode (shown when Supabase isn't configured yet) -->
+    <div class="auth__card" id="demo-card" hidden>
+      <div>
+        <p class="eyebrow">Staff area</p>
+        <h1>Inventory</h1>
+      </div>
+      <p class="auth__note">The inventory isn't connected to a database yet. You can try it in demo mode. Demo data is only saved in this browser.</p>
+      <a class="btn" href="inventory.html">Open demo</a>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script>
+    (async () => {
+      const $ = (id) => document.getElementById(id);
+      const note = (el, msg) => { el.textContent = msg; el.hidden = !msg; };
+
+      if (DB.demo) {
+        $("login-form").hidden = true;
+        $("demo-card").hidden = false;
+        return;
+      }
+
+      let recovering = location.hash.includes("type=recovery");
+      DB.onRecovery(() => {
+        recovering = true;
+        $("login-form").hidden = true;
+        $("reset-form").hidden = false;
+      });
+
+      if (!recovering && (await DB.getUser())) {
+        location.replace("inventory.html");
+        return;
+      }
+
+      $("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = $("lg-submit");
+        btn.disabled = true;
+        btn.textContent = "Signing in…";
+        note($("login-note"), "");
+        try {
+          await DB.signIn($("lg-user").value.trim(), $("lg-pass").value);
+          location.replace("inventory.html");
+        } catch (err) {
+          note($("login-note"), "Wrong email or password.");
+          btn.disabled = false;
+          btn.textContent = "Sign in";
+        }
+      });
+
+      $("lg-forgot").addEventListener("click", async () => {
+        const email = $("lg-user").value.trim();
+        if (!email) return note($("login-note"), "Type your email above first, then click “Forgot password?”.");
+        try {
+          await DB.resetPassword(email);
+          note($("login-note"), "If that email has an account, a reset link is on its way.");
+        } catch (err) {
+          note($("login-note"), err.message);
+        }
+      });
+
+      $("reset-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          await DB.setPassword($("rs-pass").value);
+          location.replace("inventory.html");
+        } catch (err) {
+          note($("reset-note"), err.message);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
