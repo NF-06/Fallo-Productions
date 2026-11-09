@@ -73,6 +73,7 @@ const I18N = {
     "gallery.filterLabel": "Filtrer bilder",
     "gallery.all": "Alle",
     "photo.label": "{title}, bilde {n}",
+    "gallery.share": "Kopier lenke til {title}, bilde {n}",
 
     // Previous works
     "works.eyebrow": "Tidligere arbeid",
@@ -121,6 +122,9 @@ const I18N = {
     "lightbox.prev": "Forrige bilde",
     "lightbox.next": "Neste bilde",
     "lightbox.photo": "{title} — bilde {n}",
+    "lightbox.copyLink": "Kopier lenke",
+    "lightbox.copied": "Lenke kopiert!",
+    "lightbox.copyFailed": "Kunne ikke kopiere",
 
     // Words used in the project list (js/main.js)
     terms: {
@@ -184,6 +188,7 @@ const I18N = {
     "gallery.filterLabel": "Filter photos",
     "gallery.all": "All",
     "photo.label": "{title}, photo {n}",
+    "gallery.share": "Copy link to {title}, photo {n}",
 
     "works.eyebrow": "Previous works",
     "works.title": "Projects",
@@ -228,6 +233,9 @@ const I18N = {
     "lightbox.prev": "Previous photo",
     "lightbox.next": "Next photo",
     "lightbox.photo": "{title} — photo {n}",
+    "lightbox.copyLink": "Copy link",
+    "lightbox.copied": "Link copied!",
+    "lightbox.copyFailed": "Couldn't copy",
 
     terms: {},
   },

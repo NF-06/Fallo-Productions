@@ -255,7 +255,14 @@
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Bildevisning" data-i18n-aria="lightbox.label">
     <div class="lightbox__bar">
       <span class="lightbox__counter" id="lb-counter"></span>
-      <button class="lightbox__close" id="lb-close" aria-label="Lukk" data-i18n-aria="lightbox.close">✕</button>
+      <div class="lightbox__actions">
+        <!-- Copy link: only shown for photos opened from the gallery -->
+        <button class="lightbox__copy" id="lb-copy" type="button" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span id="lb-copy-text" data-i18n="lightbox.copyLink">Kopier lenke</span>
+        </button>
+        <button class="lightbox__close" id="lb-close" aria-label="Lukk" data-i18n-aria="lightbox.close">✕</button>
+      </div>
     </div>
     <div class="lightbox__stage" id="lb-stage">
       <img id="lb-img" alt="" hidden>

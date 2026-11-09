@@ -263,19 +263,44 @@ function renderGallery(cat = galleryCat) {
   el.innerHTML = galleryItems
     .map(
       (ph, i) => `
-    <button class="tile ${TILE_PATTERN[i % TILE_PATTERN.length]}" data-index="${i}"
-            aria-label="${t("photo.label", { title: ph.project.title, n: ph.index + 1 })}">
-      <span class="tile__img" data-bg="${ph.src}"></span>
-      <span class="tile__cap"><small>${tr(ph.project.category)}</small>${ph.project.title}</span>
-    </button>`
+    <div class="tile ${TILE_PATTERN[i % TILE_PATTERN.length]}" data-index="${i}">
+      <button class="tile__open" aria-label="${t("photo.label", { title: ph.project.title, n: ph.index + 1 })}">
+        <span class="tile__img" data-bg="${ph.src}"></span>
+        <span class="tile__cap"><small>${tr(ph.project.category)}</small>${ph.project.title}</span>
+      </button>
+      <button class="tile__share" aria-label="${t("gallery.share", { title: ph.project.title, n: ph.index + 1 })}">${SHARE_ICON}</button>
+    </div>`
     )
     .join("");
   applyBackgrounds(el);
 }
 
-$("#gallery").addEventListener("click", (e) => {
+const SHARE_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="19" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4" stroke="currentColor" stroke-width="1.6"/></svg>`;
+
+$("#gallery").addEventListener("click", async (e) => {
   const tile = e.target.closest(".tile");
-  if (tile) openLightbox(galleryItems, Number(tile.dataset.index));
+  if (!tile) return;
+  const index = Number(tile.dataset.index);
+
+  // Share icon: copy the link to this photo (same link as "Copy link" in the photo viewer)
+  const share = e.target.closest(".tile__share");
+  if (share) {
+    try {
+      await copyText(photoLink(galleryItems[index]));
+      share.dataset.tip = t("lightbox.copied");
+      share.classList.add("is-done");
+    } catch (err) {
+      share.dataset.tip = t("lightbox.copyFailed");
+    }
+    clearTimeout(share._timer);
+    share._timer = setTimeout(() => {
+      delete share.dataset.tip;
+      share.classList.remove("is-done");
+    }, 2000);
+    return;
+  }
+
+  if (e.target.closest(".tile__open")) openLightbox(galleryItems, index, { shareable: true });
 });
 
 /* ---------- previous works ---------- */
@@ -336,10 +361,13 @@ const lb = {
 };
 lb.el.inert = true;
 
-function openLightbox(items, index) {
+// shareable: true shows the "Copy link" button (only used by the gallery)
+function openLightbox(items, index, { shareable = false } = {}) {
   if (!items.length) return;
   lb.items = items;
   lb.lastFocus = document.activeElement;
+  $("#lb-copy").hidden = !shareable;
+  resetCopyButton();
   lb.el.classList.add("is-open");
   lb.el.inert = false;
   document.body.classList.add("no-scroll");
@@ -352,7 +380,74 @@ function closeLightbox() {
   lb.el.inert = true;
   if (!menu.classList.contains("is-open")) document.body.classList.remove("no-scroll");
   lb.lastFocus?.focus();
+  // Remove "#photo=..." from the address bar, so reloading doesn't open the photo again
+  if (location.hash.startsWith("#photo=")) history.replaceState(null, "", location.pathname + location.search);
 }
+
+/* ---------- share links to gallery photos ----------
+   A link looks like  https://.../#photo=Addams/3
+   = project id "Addams", photo number 3 (counting from 1).
+   Opening it scrolls to the gallery and opens that photo. */
+
+function photoLink(ph) {
+  const url = new URL(location.href);
+  url.hash = `photo=${encodeURIComponent(ph.project.id)}/${ph.index + 1}`;
+  return url.href;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    // Older browsers: copy through a hidden text box
+    const box = document.createElement("textarea");
+    box.value = text;
+    box.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(box);
+    box.select();
+    const ok = document.execCommand("copy");
+    box.remove();
+    if (!ok) throw e;
+  }
+}
+
+let copyTimer;
+function resetCopyButton() {
+  clearTimeout(copyTimer);
+  $("#lb-copy").classList.remove("is-done");
+  $("#lb-copy-text").textContent = t("lightbox.copyLink");
+}
+
+$("#lb-copy").addEventListener("click", async () => {
+  const text = $("#lb-copy-text");
+  try {
+    await copyText(photoLink(lb.items[lb.i]));
+    text.textContent = t("lightbox.copied");
+    $("#lb-copy").classList.add("is-done");
+  } catch (e) {
+    text.textContent = t("lightbox.copyFailed");
+  }
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(resetCopyButton, 2000);
+});
+
+function openPhotoFromLink() {
+  const match = location.hash.match(/^#photo=([^/]+)\/(\d+)$/);
+  if (!match) return;
+  const id = decodeURIComponent(match[1]);
+  const number = Number(match[2]);
+
+  // Show all photos, so the linked one is in the gallery
+  if (galleryCat !== "All") {
+    renderGallery("All");
+    renderFilters();
+  }
+  $("#portfolio").scrollIntoView({ behavior: "instant" });
+
+  const index = galleryItems.findIndex((ph) => ph.project.id === id && ph.index + 1 === number);
+  if (index !== -1) openLightbox(galleryItems, index, { shareable: true });
+}
+window.addEventListener("hashchange", openPhotoFromLink);
 
 function showPhoto(index) {
   const n = lb.items.length;
@@ -519,7 +614,9 @@ document.addEventListener("languagechange", () => {
   setMenu(menu.classList.contains("is-open"));
   onScroll();
   if (lb.el.classList.contains("is-open")) showPhoto(lb.i);
+  resetCopyButton();
 });
+openPhotoFromLink(); // if the page was opened from a shared photo link
 onScroll();
 window.addEventListener("scroll", onScroll, { passive: true });
 window.addEventListener("resize", onScroll);
